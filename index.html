@@ -1,0 +1,136 @@
+<html>
+  <head>
+    <title>Student Bootcamp - Networking Exercises</title>
+
+    <link rel="stylesheet" href="styles/ui.css"/>
+
+    <script>
+
+      function reveal( targetName )
+      {
+        target = document.getElementById(targetName);
+
+        target.style.display = ( target.style.display == "block" ? "none" : "block" );
+      }
+
+    </script>
+  </head>
+
+  <body>
+    <div style="width:100%;" align="right"><img src="images/redhat.png" width="250px"/></div>
+
+    <div style="padding:10px">
+    <h1>Student Bootcamp - OpenShift Networking Exercises</h1>
+
+    Welcome to the Red Hat Student Bootcamp OpenShift networking exercises. This page will guide you through creating some applications and examining the networking available between them from a developer viewpoint; this session should take about an hour,
+    but the cluster will remain up and active for the rest of the day if you run out of time.<br/><br/>
+
+    For this exercise please use the Cluster URL provided, along with the username (format userX where X is a number) and the password <b>openshift</b><br/><br/>
+
+    <h2>Logging on to the system</h2>
+    
+    Go the URL provided for the Cluster.<br/><br/>
+    Your username will be "userX" where X is a number. Your password is <b>openshift</b>.<br/><br/>
+    Once you have logged in you will be presented with the developer's perspective; if you have previously logged in and gone to the administrator's perspective switch to the developer's perspective using the pulldown at the top left of the user interface.<br/><br/>
+
+    <h2>Creating a Project/Namespace</h2>
+
+    Click on the pulldown at the top left of the page (Project: All Projects). Select <b>Create Project</b><br/><br/>
+
+    <b>IMPORTANT</b> - for the name of your project use "networktestX" where X is the number of your user. Do <b>not</b> use X. Click on <b>Create</b><br/><br/>
+
+    <img src="images/net1.png" width="300px"/><br/><br/>
+
+    You will now see a topology page similar to this:<br/><br/>
+
+    <img src="images/net2.png" width="100%"/><br/><br/>
+    
+    <h2>Creating the test applications</h2>
+
+    Click on 'Add+'<br/><br/>
+
+    Click on 'All Services' in the Developer Catalog<br/><br/>
+
+    <img src="images/net3.png" width="300px"/><br/><br/>
+
+    Click on 'Type/Builder Images'.<br/><br/>
+
+    Click on the "Node.js" Builder Image tile.<br/><br/>
+
+    Click on the "Create Application" button.<br/><br/>
+
+    Scroll down to the "Git Repo URL" entry point. Click on the "Try sample" link beneath to populate the field.<br/><br/>
+
+    Scroll down and type "app1" in the "Name" field (<b>Important</b> - use the Name field and not the Application Name field).<br/><br/>
+
+    Click the "Create" button.<br/><br/>
+
+    While the application is building click on "Add+" again. We will be adding a second application in the project.<br/><br/>
+
+    Again, choose 'All Services' in the Developer Catalog.<br/><br/>
+
+    Again, click on 'Type/Builder Images'.<br/><br/>
+
+    Again, click on the "Node.js" tile.<br/><br/>
+
+    Again, click on the "Create Application" button.<br/><br/>
+
+    Use the 'Try sample' link to fill the git repo URL again.<br/><br/>
+
+    This time set the "Name" field (not the Application Name) to "app2". Then click the "Create" button again. <br/><br/>
+
+    Wait for the second application to build and be deployed. This will be complete when <b>both</b> the icons displayed switch to <font color="blue">Dark Blue</font> borders.<br/><br/>
+
+    <img src="images/net4.png" width="100%"/>
+
+    <h2>Experimenting with SDN networking</h2>
+
+    Now we are going to communicate between the two Pods using the SDN and the Services described in the course. To do this we are going to go into the applications themselves using the User Interface.<br/><br/>
+
+    First click on the 'app1' icon in the topology. A panel will appear on the right-hand side showing the details of this deployment; there will be a section called <b>Pods</b>; this shows the actual Pods that are running your application. Click on the Pod itself (it will have a name that starts with "app1-".<br/><br/>
+
+    You should now see a screen with an overview of the Pod itself.<br/><br/>
+
+    <img src="images/net5.png" width="100%"/>
+
+    Now click on the 'Terminal' tab; this will create a terminal into the running Pod from which we will do some networking tests.<br/><br/>
+
+    <img src="images/net6.png" width="100%"/>
+
+    We are going to use the curl command to pull traffic from the target services. This command takes a URL and connects to the target, and then pulls the webpage back. First try this:<br/><br/>
+
+    <img src="images/net7.png" width="300px"/><br/><br/>
+
+    If this works you will see a chunk of HTML. This is the response from the application you are in; by using the url "http://app1:8080" you have gone straight to the Service point of the application.<br/><br/>
+
+    Now try:<br/><br/>
+
+    <img src="images/net8.png" width="300px"/><br/><br/>
+
+    You should see some HTML again. This time you have connected to the <b>other</b> application across the SDN using the "app2" service.<br/><br/>
+
+    This shorthand gives you the ability to communicate between applications in the same Project using the Service name directly; the advantage of this is that you are not going outside of the SDN and can shortcut the addressing using the name of the service.<br/><br/>
+
+    Also be aware that if you have multiple copies of your application, by scaling up, the Service remains singular; you could have one Pod for your application or a hundred, and still access it directly using the shorthand Service name.<br/><br/>
+
+    Now try:<br/><br/>
+
+    <img src="images/net9.png" width="600px"/><br/><br/>
+
+    <i>Remember to change the number as stated to your Projects number.</i><br/><br/>
+
+    You should see a chunk of HTML. What we have done here is to expand the name to include the Project. We have to add the ".svc.cluster.local" as it is a fully qualified domain name that is Cluster wide. This means you can access, if you are allowed, Services directly by name in other Projects.<b/><br/>
+
+    <h2>Additional Extra Exercises</h2>
+
+    If you want some fun, try and do the following:<br/><br/>
+
+    <b>1</b> Create a second Project called "anothernetworktestX", replacing X with your number<br/>
+    <b>2</b> Add an application called app3 in this new project<br/>
+    <b>3</b> Go into the Terminal for the new application and see if you can work out how to directly call the app1 application in your first project<br/>
+    <b>4</b> <font color="red">ADVANCED</font> Using the Administrator view go to the Networking tab and see if you can add a Network Policy to stop Services in your second project from calling Services in your first project. This will require you to read up on Network Policies; try using docs.openshift.com to see how<br/>
+
+
+  </div>
+  </body>
+</html>
