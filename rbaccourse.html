@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Lunch and Learn - Introduction to OCP4.7</title>
+    <title>Student Bootcamp - RBAC Exercises</title>
 
     <link rel="stylesheet" href="styles/ui.css"/>
 
@@ -20,97 +20,60 @@
     <div style="width:100%;" align="right"><img src="images/redhat.png" width="250px"/></div>
 
     <div style="padding:10px">
-    <h1>OpenShift Lunch and Learn - Introduction</h1>
+    <h1>Student Bootcamp - OpenShift RBAC Exercises</h1>
 
-    Welcome to the OpenShift Lunch and Learns. In this session we will be playing with OpenShift as an additional introduction to the technologies; this session should take about an hour,
+    Welcome to the Red Hat Student Bootcamp OpenShift RBAC exercises. This page will guide you through examining the objects within OpenShift that provide the RBAC functionality; this session should take about 30 minutes,
     but the cluster will remain up and active for the rest of the day if you run out of time.<br/><br/>
 
-    Cluster is available at <a href="https://console-openshift-console.apps.cluster-a243.a243.sandbox693.opentlc.com/" target="_new"> this link</a> - the presenter will allocate usernames, but all the passwords are set to <b>openshift</b><br/><br/>    
+    For this exercise please use the Cluster URL provided, along with the username (format userX where X is a number) and the password <b>openshift</b><br/><br/>
 
     <h2>Logging on to the system</h2>
     
-    Click <a href="https://console-openshift-console.apps.cluster-a243.a243.sandbox693.opentlc.com/" target="_new">here</a> to start the console.<br/><br/>
-    Your username will be "userX" where X is a number allocated by the presenter. Your password is <b>openshift</b>.<br/><br/>
-    Once you have logged you you will be presented with the developer's perspective; choose to take the tour if you want a quick overview of the interface.<br/><br/>
+    Go the URL provided for the Cluster.<br/><br/>
+    Your username will be "userX" where X is a number. Your password is <b>openshift</b>.<br/><br/>
+    Once you have logged in you may be presented with the developer's perspective; for this exercise we will be using the  administrator's perspective. Switch to the administrator's perspective using the pulldown at the top left of the user interface.<br/><br/>
+
+    <img src="images/rbac1.png" width="300px"/><br/><br/>
 
     <h2>Creating a Project/Namespace</h2>
 
-    Once you have gone through the tour you will be at the topology page; click on the pulldown at the top left of the page (Project: All Projects). Select <b>Create Project</b><br/><br/>
+    In order to examine the Objects used to access OpenShift we will create a project from scratch.<br/><br/>
 
-    Enter "sandbox-(put your name here)" as the Name of the project and then click on <b>Create</b><br/><br/>
+    Open the Project tab by going to Home/Projects.<br/><br/>
 
-    You will now see a topology page similar to this:<br/><br/>
+    Click on "Create Project".<br/><br/>
 
-    <img src="images/screen1.png" width="100%"/><br/><br/>
-    
-    <h2>Creating your first application</h2>
+    Set the name of your project to "rbactestX", replacing X with your user number.<br/><br/>
 
-    Click on 'From Catalog'<br/><br/>
+    <img src="images/rbac2.png" width="600px"/><br/><br/>
 
-    When the Developer Catalog is shown, click on <b>Builder Images</b> under <b>Type</b><br/><br/>
+    Hit "Create" to create the project.<br/><br/>
 
-    <img src="images/screen5.png" width="100%"/><br/></br>
+    <h2>Examining the default rolebindings for a project</h2>
 
-    Click on the .NET Core 'Builder Image'. On the side panel click on 'Create Application'.<br/><br/>
+    When you have created the project you will be at the Overview tab for the newly created project. Click on "RoleBindings".<br/><br/>
 
-    All fields on the wizard that are mandatory are marked with a '*'. Leave the 'Builder Image Version' as '3.1-el7'. For the 'Git Repo URL' click on the 'Try Sample' link just beneath the text box.<br/><br/>
+    <img src="images/rbac3.png" width="100%"/>
 
-    Scroll down to the 'General' section. Change the 'Name' field to read <b>dotnetapp</b>. <br/><br/>
+    This page shows a summary of the RBAC Role Bindings currently active for this project. Note that the User who created the project, yourself, has the Cluster Role of <b>admin</b> bound to the namespace, giving you the ability to create and delete resources within the project.<br/><br/>
 
-    In the 'Resources' section change the resource to <b>DeploymentConfig</b>. Leave 'Create a Route to the Application' selected.<br/><br/>
+    Note also the system:image-pullers role binding applied to 'Group'. This means that any Service Account in the group system:serviceaccounts:rbactest1 can pull images from the integrated registry. This nomenclature of 'system.serviceaccounts.(x)', where x is a namespace, allows for wildcard application of rolebindings.<br/><br/>
 
-    Click 'Create'. When the Topology page appears with the 'dotnetapp' icon click on it and watch the progress of the 'Build'.<br/><br/>
+    <h2>Examining the Service Accounts for a Project</h2>
 
-    Once the build completes the composite image with the application will be delivered into the registry and OpenShift will deploy it. This is indicated by a <font color="blue">blue</font> ring around the app.<br/><br/>
+    Using the left-hand navigation bar, select User Management/ServiceAccounts.<br/><br/>
 
-    <h2>Creating a second application</h2>
+    <img src="images/rbac4.png" width="100%"/>
 
-    Now click on <b>Add+</b> again. Click on 'From Catalog'. In the 'Filter by keyword' search box type <b>node</b>. Click on the 'Builder Image' for Node.js.<br/><br/>
+    Note the three ServiceAccounts created when the Project was created. The <b>default</b> ServiceAccount is the one that is used by default when no other ServiceAccount is defined as part of the specification for an Object. Both <b>builder</b> and <b>deployer</b> are special case ServiceAccounts that are used to build composite images (when you do a source-to-image build) and when you deploy images to worker nodes. Both of these actions need additional system privileges that should not be available to the default ServiceAccount, so these are provisioned to allow the User to create Images and deploy Pods.<br/><br/>
 
-    Click on <b>Create Application</b>. Leave the 'Builder Image Version' as '14-ubi7'. For the 'Git Repo URL' enter (or copy and paste) <b>https://github.com/utherp0/ocpnode</b>. When you populate this textbox the system will validate it; if it
-    says it is invalid check the URL carefully.<br/><br/>
+   <h2>Examining Roles</h2>
 
-    In <b>General</b> click on the pulldown for <b>Application</b> and select 'Create Application'. When the <b>Application Name</b> textbox appears set it to be <b>ocpnodeapp</b>.<br/><br/>
+   Roles are the lists of actions that can be applied to Objects. You can view these by going, on the left-hand navigation panel, to User Management/Roles.<br/><br/>
 
-    Again, change the <b>Resources</b> to 'DeploymentConfig'. Make sure the 'Create a Route to Application' is ticked. Hit <b>Create</b>. When the topology page is rendered, click on the new Node icon to watch the build.<br/><br/>
+   Click on the 'Admin' role and have a look at the varied set of verbs, the objects they can be applied to (listed under 'Resources') and the API Groups that control them.<br/><br/>
 
-    <img src="images/screen6.png" width="100%"/><br/><br/>
+   <img src="images/rbac5.png" width="100%"/>
 
-    <h2>Creating a Serverless application</h2>
-
-    Now click on <b>Add+</b> again. Click on 'From Catalog'. In the 'Filter by keyword' search box type <b>go</b>. Click on the 'Builder Image' for 'GO'.<br/><br/>
-
-    Click on <b>Create Application</b>. Leave the 'Builder Image Version' as '1.14.7-ubi8'. For the 'Git Repo URL' click on the 'Try Sample' link beneath the textbox.<br/><br/>
-
-    In <b>General</b> click on the pulldown for <b>Application</b> and select 'Create Application'. When the <b>Application Name</b> textbox appears set it to be <b>golangapp</b><br/<br/>
-
-    In <b>Resources</b> select the 'Knative Service'. Click <b>Create</b>.<br/><br/>
-
-    The topology page will reappear; the golangapp will look different to the other two applications created. This is a Knative Service. Click on the 'golang-ex-git' <b>KSVC</b> point to view the sidebar. Observe the build complete.<br/><br/>
-
-    Once the build has completed the Pod will be active; the screen will look like:<br/><br/>
-
-    <img src="images/screen7.png" width="100%"/><br/><br/>
-
-    If you watch the topology for 30 seconds or so, the Pod will terminate; it will go dark blue for a short period, and then render with a white border, indicating it is running at zero replicas. <br/><br/>
-
-    We are now going to send it traffic to force OpenShift to spin up the application; hover over the 'URL' link at the top right of the Knative Service (shown below):<br/><br/>
-
-    <img src="images/screen8.png" width="100%"/><br/><br/>
-
-    Click on the link - you will be taken to a new tab. Quickly click back on the tab with the Topology in it and watch the application spin up. Go back to the tab that has just opened and you will see the output of the application.<br/><br/>
-
-    <h2>Additional Extra Exercises</h2>
-
-    If you want some fun, try and do the following:<br/><br/>
-
-    <b>1</b> Scale the .NET application to five copies<br/>
-    <b>2</b> See if you can curl the ocpnode application from within the .NET Pod (hint, use the service name and the port as part of the curl)<br/>
-    <b>3</b> See if you can give someone else access to <b>view</b> the contents of your project (hint, look at the Project/Project Access tab in the Developer view)<br/>
-    <b>4</b> Using the Administrator view, see if you can scale the ocpnode application to 10 copies (hint, look at Workloads, DeploymentConfigs and try changing the YAML)<br/>
-    <b>5</b> Try a quickstart - click Add+ in the developer view point and then 'View All Quick Starts'. Pick one you are interested in.
-
-
-  </div>
   </body>
 </html>
